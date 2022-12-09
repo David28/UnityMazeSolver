@@ -11,7 +11,8 @@ public class LoadGame : MonoBehaviour
     public GameObject widthField;
     public GameObject heightField;
 
-    public GameObject prefab;
+    [SerializeField] private SizeData size;
+
     public void Load()
     {
 
@@ -59,12 +60,12 @@ public class LoadGame : MonoBehaviour
     {
         string s = heightField.GetComponent<InputField>().text;
         if (Check(heightField))
-            prefab.GetComponent<Finder>().h = int.Parse(s);
+            size.height = int.Parse(s);
     }
     public void SetWidth()
     {
         string s = widthField.GetComponent<InputField>().text;
         if (Check(widthField))
-            prefab.GetComponent<Finder>().w = int.Parse(s);
+            size.width = int.Parse(s);
     }
 }

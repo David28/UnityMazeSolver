@@ -32,8 +32,9 @@ public class Finder : MonoBehaviour
     Vector2Int cur;
     Queue<Vector2Int> q;
     int visited;
-    public int h;
-    public int w;
+
+    [SerializeField] private SizeData size;
+
     bool mazeDone;
     int iter;
     bool solved;
@@ -64,18 +65,17 @@ public class Finder : MonoBehaviour
     void Start()
     {
 
-
         // make a 20 by 20 grid of objects
-        tiles = new GameObject[w, h];
-        caves = new GameObject[w, h];
-        horizontalWalls = new GameObject[w, h + 1];
-        verticalWalls = new GameObject[w + 1, h];
-        t = new CellInfo[w, h];
-        int x = w;
+        tiles = new GameObject[size.width, size.height];
+        caves = new GameObject[size.width, size.height];
+        horizontalWalls = new GameObject[size.width, size.height + 1];
+        verticalWalls = new GameObject[size.width + 1, size.height];
+        t = new CellInfo[size.width, size.height];
+        int x = size.width;
         while (x > 0)
         {
             x--;
-            int y = h;
+            int y = size.height;
             while (y > 0)
             {
                 y--;
@@ -84,19 +84,19 @@ public class Finder : MonoBehaviour
                 caves[x, y] = Instantiate(blindPrefab, new Vector2(x, y), Quaternion.identity);
                 t[x, y] = new CellInfo();
             }
-            horizontalWalls[x, h] = Instantiate(hPrefab, new Vector2(x, h - 0.5f), Quaternion.identity);
+            horizontalWalls[x, size.height] = Instantiate(hPrefab, new Vector2(x, size.height - 0.5f), Quaternion.identity);
         }
-        for (int i = h - 1; i >= 0; i--)
+        for (int i = size.height - 1; i >= 0; i--)
         {
-            verticalWalls[w, i] = Instantiate(vPrefab, new Vector2(w - 0.5f, i), Quaternion.identity);
+            verticalWalls[size.width, i] = Instantiate(vPrefab, new Vector2(size.width - 0.5f, i), Quaternion.identity);
         }
-        Camera.main.transform.position = new Vector3(w / 2f, h / 2f, -10);
-        Camera.main.orthographicSize = Mathf.Max(w, h) / 2f + 1;
+        Camera.main.transform.position = new Vector3(size.width / 2f, size.height / 2f, -10);
+        Camera.main.orthographicSize = Mathf.Max(size.width, size.height) / 2f + 1;
 
 
-        Vector2Int start = new Vector2Int(Random.Range(0, 2) * (w - 1), Random.Range(0, 2) * (h - 1));
-        backGround = Instantiate(backPrefab, new Vector3(w / 2 - 0.5f, h / 2 - 0.5f), Quaternion.identity);
-        backGround.transform.localScale += new Vector3(w - 1, h - 1);
+        Vector2Int start = new Vector2Int(Random.Range(0, 2) * (size.width - 1), Random.Range(0, 2) * (size.height - 1));
+        backGround = Instantiate(backPrefab, new Vector3(size.width / 2 - 0.5f, size.height / 2 - 0.5f), Quaternion.identity);
+        backGround.transform.localScale += new Vector3(size.width - 1, size.height - 1);
         q = new Queue<Vector2Int>();
         cur = start;
         here = Vector2Int.zero;
@@ -111,8 +111,8 @@ public class Finder : MonoBehaviour
         int b = Random.Range(0, 2);
         if (b == 0)
         {
-            int lr = Random.Range(0, 2) * (w - 1);
-            int rh = Random.Range(0, h);
+            int lr = Random.Range(0, 2) * (size.width - 1);
+            int rh = Random.Range(0, size.height);
             if (lr == 0)
                 Destroy(verticalWalls[lr, rh]);
             else
@@ -121,8 +121,8 @@ public class Finder : MonoBehaviour
         }
         else
         {
-            int ud = Random.Range(0, 2) * (h - 1);
-            int rw = Random.Range(0, h);
+            int ud = Random.Range(0, 2) * (size.height - 1);
+            int rw = Random.Range(0, size.height);
             if (ud == 0)
                 Destroy(horizontalWalls[rw, ud]);
             else
@@ -289,11 +289,11 @@ public class Finder : MonoBehaviour
         {
                     Vector3 j = x.transform.position;
         Vector2Int i = new Vector2Int((int)j.x, (int)j.y);
-        if (i.x == w - 1)
+        if (i.x ==size.width- 1)
             verticalWalls[i.x + 1, i.y] = Instantiate(vPrefab, new Vector3(i.x + 0.5f, i.y), Quaternion.identity);
         else if (i.x == 0)
             verticalWalls[i.x, i.y] = Instantiate(vPrefab, new Vector3(i.x - 0.5f, i.y), Quaternion.identity);
-        else if (i.y == h - 1)
+        else if (i.y == size.height - 1)
             horizontalWalls[i.x, i.y + 1] = Instantiate(hPrefab, new Vector3(i.x, i.y + 0.5f), Quaternion.identity);
         else
             horizontalWalls[i.x, i.y] = Instantiate(hPrefab, new Vector3(i.x, i.y - 0.5f), Quaternion.identity);
@@ -305,15 +305,15 @@ public class Finder : MonoBehaviour
     {
 
 
-            for (int i = 0; i < w; i++)
+            for (int i = 0; i < size.width; i++)
             {
-                for (int j = 0; j < h; j++)
+                for (int j = 0; j < size.height; j++)
                 {
                     if (tiles[i, j] != null)
                         Destroy(tiles[i, j]);
                 }
             }
-            tiles = new GameObject[w, h];
+            tiles = new GameObject[size.width, size.height];
         
         RedoPointWall(startT);
         RedoPointWall(endT);
@@ -339,7 +339,7 @@ public class Finder : MonoBehaviour
     {
         iter = 0;
         Visit(i);
-        if (visited == h * w)
+        if (visited == size.height * size.width)
         {
             mazeDone = true;
             Destroy(head);
@@ -420,7 +420,7 @@ public class Finder : MonoBehaviour
 
     bool In(Vector2Int i)
     {
-        return i.x >= 0 && i.x < w && i.y >= 0 && i.y < h;
+        return i.x >= 0 && i.x < size.width && i.y >= 0 && i.y < size.height;
     }
     bool Blocked(Vector2Int i)
     {
