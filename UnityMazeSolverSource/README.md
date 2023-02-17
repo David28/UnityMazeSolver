@@ -1,5 +1,5 @@
 # UnityMazeSolver
-Hi, I'm David
+Hey
 
 This simple unity project is for creating and solving a maze.
 Began developing after watching a maze generation gif on a website.
